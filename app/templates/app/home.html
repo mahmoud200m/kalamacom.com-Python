@@ -1,0 +1,128 @@
+﻿{% extends "app/layout.html" %}
+
+{% block content %}
+{% load static %}
+
+<div id="side_bar">
+    <input id="side_bar_selection" type="text" placeholder="search ..." class="form-control" />
+    <ul id="side_bar_list">
+        <li>investment</li>
+        <li>Saudi Holland</li>
+        <li>Saudi French</li>
+        <li>Saab</li>
+        <li>National Arabic</li>
+        <li>Sampia</li>
+        <li>Tassi</li>
+        <li>Al Ryadh</li>
+        <li>Al Gazirah </li>
+        <li>National Arabian</li>
+        <li>Al Raghy</li>
+        <li>Al Belad</li>
+        <li>Al Enmaa</li>
+        <li>Kemanool</li>
+        <li>Petrokim</li>
+        <li>Saabek</li>
+        <li>Safco</li>
+        <li>Manufucturing</li>
+        <li>Al Lojain</li>
+        <li>Namaa Chemicals</li>
+        <li>Saudi Group</li>
+        <li>Saharaa petrochemicals</li>
+        <li>Yansab</li>
+        <li>Haael sement</li>
+        <li>Nagran sement</li>
+        <li>City sement</li>
+        <li>Alshamaleya sement</li>
+        <li>Arabic sement</li>
+        <li>Yamama sement</li>
+        <li>Saudia sement</li>
+        <li>Qasem sement</li>
+        <li>Ganobeya sement</li>
+        <li>Yanbo sement</li>
+        <li>Sharqeyya sement</li>
+        <li>Tabook sement</li>
+        <li>Gawf sement</li>
+        <li>Othaim markets</li>
+        <li>Mowasah</li>
+        <li>Xtra</li>
+        <li>Dallah health</li>
+        <li>Reaya</li>
+        <li>Sasco</li>
+        <li>Themar</li>
+        <li>Fitaihi group</li>
+        <li>Jarir</li>
+        <li>Aldrees</li>
+        <li>Alhaker</li>
+        <li>Alkhaleej</li>
+        <li>Gasco</li>
+        <li>Saudi electricity</li>
+        <li>Savola group</li>
+        <li>Sadafco</li>
+        <li>Maraii</li>
+        <li>Anaam group</li>
+        <li>Halwani brothers</li>
+        <li>Herfy food</li>
+        <li>Saudia catering</li>
+        <li>Nadec</li>
+        <li>Qassim-agricultur</li>
+        <li>Tabuk</li>
+        <li>Asmak</li>
+    </ul>
+</div>
+
+<div id="main_content">
+    <h1 class="page-header">Tweets</h1>
+    <div id="twittes"></div>
+    <div id="twittes_loading">
+        <img src="{% static 'app/images/loading.gif' %}" />
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+{% load static %}
+<script type="text/javascript" src="{% static 'django_ajax/js/jquery.ajax.min.js' %}"></script>
+<script type="text/javascript">
+    $(window).load(function () {
+        var screenWidth = document.documentElement.clientWidth;
+        var screenHeight = document.documentElement.clientHeight;
+
+        $("#side_bar").css({ "min-height": (screenHeight - 52) + "px" });
+        $("#main_content").width(screenWidth - 270);
+    });
+
+    $('#side_bar_selection').keyup(function () {
+        var value = $(this).val();
+        $("#side_bar_list > li").each(function () {
+            if ($(this).text().indexOf(value) > -1) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+    });
+
+    $('#side_bar_list > li').click(function () {
+        $('.select_list_item').removeClass('select_list_item');
+        $(this).addClass('select_list_item');
+
+        $('#twittes').fadeOut('fast');
+        $('#twittes_loading').fadeIn('fast');
+        ajaxPost('/get_twittes', { 'query': $(this).text() }, function (content) {
+            $('#twittes').html('');
+            for (var i = 0; i < content.statuses.length; i++) {
+                text = content.statuses[i]['text'];
+                date = content.statuses[i]['created_at'];
+                followers_no = content.statuses[i]['user']['followers_count'];
+                image = content.statuses[i]['user']['profile_image_url'];
+                $('#twittes').append('<div class="twitte"><img src="' + image + '" /><p>' + text + '<br />' + date + '<br /><span>Followers no: ' + followers_no + '</span></p></div>');
+            }
+
+            $('#twittes').fadeIn('fast');
+            $('#twittes_loading').fadeOut('fast');
+        });
+    });
+</script>
+
+{% endblock %}
